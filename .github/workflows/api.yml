@@ -13,9 +13,9 @@ jobs:
 
       # INstall Node on the runner
       - name: Install Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "12.x"
+          node-version: "16.x"
 
 
       # Install the newman command line utility and also install the html extra reporter
@@ -23,6 +23,11 @@ jobs:
         run: |
           npm install -g newman
           npm install -g newman-reporter-htmlextra
+
+           # Run the POSTMAN collection
+      - name: Run POSTMAN collection
+        run: |
+          newman run Demo-My.postman_collection.json -r htmlextra --reporter-htmlextra-export testResults/htmlreport.html --reporter-htmlextra-darkTheme  > testResults/runreport1.html
 
 
       # Make directory to upload the test results
