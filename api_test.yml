@@ -1,0 +1,20 @@
+- name: Basic API Tests
+  requests:
+    - name: Get User
+      method: GET
+      url: https://api.example.com/users/1
+      headers:
+        Accept: application/json
+      assertions:
+        - json id is 1
+        - json name is "John Doe"
+
+    - name: Create User
+      method: POST
+      url: https://api.example.com/users
+      headers:
+        Content-Type: application/json
+      body: '{"name": "Alice"}'
+      assertions:
+        - status_code is 201
+        - json name is "Alice"
