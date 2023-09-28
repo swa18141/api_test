@@ -7,7 +7,7 @@ if (-not (Get-Module -Name "PSReadLine" -ListAvailable)) {
 Import-Module -Name "PSReadLine"
 
 # Read the YAML configuration file
-$apiConfig = Get-Content -Path "api_config.yml" | ConvertFrom-Yaml
+$apiConfig = Get-Content -Path "api_test.yml" | ConvertFrom-Yaml
 
 # Extract values from the configuration
 $apiUrl = $apiConfig.api_url
@@ -24,7 +24,7 @@ try {
     Invoke-Expression -Command $scriptContent
 
     # Make the API request using Invoke-RestMethod
-    $response = Invoke-RestMethod -Uri $apiUrl -Method $httpMethod -Headers $headers
+    $response = Invoke-RestMethod -Uri $apiUrl -Method $httpMethod -Headers $headers -OutFile 'test.json'
 
     # Handle the API response here
     Write-Host "API Response:"
