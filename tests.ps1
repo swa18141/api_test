@@ -7,7 +7,7 @@ if (-not (Get-Module -Name 'powershell-yaml' -ListAvailable)) {
 Import-Module 'powershell-yaml'
 
 # Read the YAML file
-$apiRequest = Convert-FromYaml -Path '.\api_request.yaml'
+$apiRequest = Convert-FromYaml -Path '.\api_test.yaml'
 
 # Define API request parameters
 $apiUrl = $apiRequest.url
