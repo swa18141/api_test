@@ -24,7 +24,7 @@ jobs:
           Import-Module -Name "PSReadLine"
 
           # Read the YAML configuration file
-          $apiConfig = Get-Content -Path "api_config.yml" | ConvertFrom-Yaml
+          $apiConfig = Get-Content -Path "api_test.yml" | ConvertFrom-Yaml
 
           # Extract values from the configuration
           $apiUrl = $apiConfig.api_url
